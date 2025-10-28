@@ -39,7 +39,10 @@ python voip_probe.py server --port 5005
 or
 python voip_probe.py server --bind 0.0.0.0 --port 5005
 
-### ✅ Step 2️⃣ — Start the Client (Remote / Branch / VPN Site)
+```
+
+### `✅ Step 2️⃣ — Start the Client (Remote / Branch / VPN Site)`
+```bash
 python voip_probe.py client \
   --host <server-ip> \
   --port 5005 \

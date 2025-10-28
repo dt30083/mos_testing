@@ -1,0 +1,14 @@
+# Use a minimal Python base image
+FROM python:3.12-slim
+
+# Set working directory
+WORKDIR /app
+
+# Copy script into container
+COPY voip_probe.py /app/voip_probe.py
+
+# Expose the UDP port used for VoIP probing (default 5005)
+EXPOSE 5005/udp
+
+# Default command to launch the server
+CMD ["python", "voip_probe.py", "server", "--bind", "0.0.0.0", "--port", "5005"]
