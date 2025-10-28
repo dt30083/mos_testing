@@ -1,0 +1,8 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+
+COPY voip_probe.py /app/voip_probe.py
+
+# Set entrypoint to client mode, so runtime args follow directly
+ENTRYPOINT ["python", "voip_probe.py", "client"]
