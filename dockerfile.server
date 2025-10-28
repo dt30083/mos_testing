@@ -1,14 +1,29 @@
-# Use a minimal Python base image
 FROM python:3.12-slim
 
-# Set working directory
+# Create non-root user for security
+RUN groupadd -r voip && useradd -r -g voip voip
+
 WORKDIR /app
 
 # Copy script into container
 COPY voip_probe.py /app/voip_probe.py
 
-# Expose the UDP port used for VoIP probing (default 5005)
+# Change ownership to non-root user
+RUN chown -R voip:voip /app
+
+# Switch to non-root user
+USER voip
+
+# Expose the UDP port used for VoIP probing
 EXPOSE 5005/udp
 
-# Default command to launch the server
-CMD ["python", "voip_probe.py", "server", "--bind", "0.0.0.0", "--port", "5005"]
+# Health check to verify server is responding
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+    CMD python -c "import socket; s=socket.socket(socket.AF_INET, socket.SOCK_DGRAM); s.settimeout(1); s.sendto(b'test', ('127.0.0.1', 5005)); s.close()" || exit 1
+
+# Use environment variables for configuration
+ENV VOIP_BIND=0.0.0.0
+ENV VOIP_PORT=5005
+
+# Default command with environment variable support
+CMD python voip_probe.py server --bind ${VOIP_BIND} --port ${VOIP_PORT}

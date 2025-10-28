@@ -179,7 +179,26 @@ done
 ```
 
 ### Docker Deployment
-See `docker-compose.yml` for containerized deployment options.
+
+**Quick Start:**
+```bash
+# Start server only
+docker-compose up server
+
+# Full testing setup (server + client)
+docker-compose --profile testing up
+```
+
+**External client testing:**
+```bash
+docker run --rm \
+  -e VOIP_HOST=192.168.1.100 \
+  -e VOIP_DURATION=60 \
+  -v $(pwd)/results:/app/results \
+  voip-probe-client --csv /app/results/test.csv
+```
+
+See `docker-README.md` for complete Docker deployment guide.
 
 ## How It Works
 

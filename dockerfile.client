@@ -1,8 +1,28 @@
 FROM python:3.12-slim
 
+# Create non-root user for security
+RUN groupadd -r voip && useradd -r -g voip voip
+
 WORKDIR /app
 
+# Copy script into container
 COPY voip_probe.py /app/voip_probe.py
 
-# Set entrypoint to client mode, so runtime args follow directly
-ENTRYPOINT ["python", "voip_probe.py", "client"]
+# Create directory for CSV output
+RUN mkdir -p /app/results && chown -R voip:voip /app
+
+# Switch to non-root user
+USER voip
+
+# Create volume mount point for results
+VOLUME ["/app/results"]
+
+# Environment variables for common client settings
+ENV VOIP_HOST=""
+ENV VOIP_PORT=5005
+ENV VOIP_PPS=50
+ENV VOIP_CODEC=g711
+ENV VOIP_DURATION=0
+
+# Set entrypoint to client mode with environment variable support
+ENTRYPOINT ["sh", "-c", "python voip_probe.py client --host ${VOIP_HOST} --port ${VOIP_PORT} --pps ${VOIP_PPS} --codec ${VOIP_CODEC} ${VOIP_DURATION:+--duration $VOIP_DURATION} $@", "--"]
